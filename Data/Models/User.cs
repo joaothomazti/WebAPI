@@ -5,7 +5,7 @@ namespace Data.Models
 {
     public class User
     {
-        [JsonIgnore]
+        //[JsonIgnore]
         public Guid UserId { get; set; }
 
         [Required(ErrorMessage = "The name field is mandatory")]

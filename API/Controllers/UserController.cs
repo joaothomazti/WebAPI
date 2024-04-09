@@ -31,17 +31,23 @@ namespace Data.Controllers
 
         [Authorize]
         [HttpGet("{id}", Name = "FindUserById")]
-        public  User? GetUserById(Guid id)
+        public async Task<ActionResult<UserDto>> GetUserById(Guid id)
         {
-            //var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.UserId == id);
-            var user =  _userService.GetUserById(id);
-            return user;
-            //return user.Select(user => new UserDto(user.UserId, user.Name, user.Email));
+            var user = await _userService.GetUserById(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return new UserDto(user.UserId, user.Name, user.Email);
+            }
         }
 
 
         [HttpPost(Name = "CreateUser")]
-        public async Task<ActionResult<UserDto>> CreateUser([FromBody] User user)
+        public ActionResult<User> CreateUser([FromBody] User user)
         {
             if (!ModelState.IsValid || user is null )
             {
@@ -50,8 +56,7 @@ namespace Data.Controllers
 
             user.Password =  Hash.HashGeneration(user.Password);
 
-            _appDbContext.Users.Add(user);
-            await _appDbContext.SaveChangesAsync();
+            _userService.CreateUser(user);
 
             var userDTO = new UserDto(user.UserId, user.Name, user.Email);
 
@@ -61,18 +66,23 @@ namespace Data.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> EditUser(Guid id, User user)
         {
+            if  (user == null)
+            {
+                throw new ArgumentNullException("O usuário não pode ser nulo");
+            }
             if (id != user.UserId)
             {
-                return BadRequest();
+                return BadRequest("O ID do usuário não corresponde ao ID na URL");
             }
 
-            _appDbContext.Entry(user).State = EntityState.Modified;
             try
             {
-                await _appDbContext.SaveChangesAsync();
-            }catch (DbUpdateConcurrencyException) 
+                _userService.UpdateUser(user);
+            }catch (Exception) 
             {
-                if (!UserExists(id))
+                var userExists = await _userService.GetUserById(id);
+
+                if (userExists == null)
                 {
                     return NotFound();
                 }
@@ -85,23 +95,17 @@ namespace Data.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(Guid id)
         {
-            var deleteUser = await _appDbContext.Users.FindAsync(id);
+            var deleteUser = await _userService.GetUserById(id);
 
             if (deleteUser == null)
             {
                 return NotFound();
             }
-            _appDbContext.Users.Remove(deleteUser);
-            await _appDbContext.SaveChangesAsync();
-
+ 
+            _userService.DeleteUser(deleteUser);
             return NoContent();
-        }
-
-        private bool UserExists(Guid id)
-        {
-            return _appDbContext.Users.Any(e => e.UserId == id);
         }
     }
 }
