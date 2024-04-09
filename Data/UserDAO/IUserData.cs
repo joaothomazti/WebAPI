@@ -8,7 +8,12 @@ namespace Data.UserDAO
     {
         public DbSet<User> GetUsers();
 
-        public DbSet<User> CreateUser(User user);
+        public void CreateUser(User user);
 
+        public void CreateUsers(IEnumerable<User> users);
+
+        public void UpdateUser(User user);
+
+        public void DeleteUser(User user);
     }
 }
