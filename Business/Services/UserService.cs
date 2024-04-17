@@ -24,14 +24,14 @@ namespace Business.Services
 
         #region User creation
 
-        public void CreateUser(User user)
+        public Task CreateUser(User user)
         {
-            _userData.CreateUser(user);
+            return _userData.CreateUser(user);
         }
 
-        public void CreateUsers(IEnumerable<User> users)
+        public Task CreateUsers(IEnumerable<User> users)
         {
-            _userData.CreateUsers(users);
+            return _userData.CreateUsers(users);
         }
         #endregion
 

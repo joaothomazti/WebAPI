@@ -22,7 +22,9 @@ namespace Data.Controllers
         public async Task<IEnumerable<UserDto>> GetUsers()
         {
             var users = await _userService.GetUsers();
-           
+
+            _logger.LogInformation("Busca ao usuario realizada com sucesso");
+
             return users.Select(user => new UserDto(user.UserId, user.Name, user.Email));
             
         }
@@ -46,7 +48,7 @@ namespace Data.Controllers
 
         #region User creation
         [HttpPost(Name = "CreateUser")]
-        public ActionResult<User> CreateUser([FromBody] User user)
+        public async Task<ActionResult<User>> CreateUser([FromBody] User user)
         {
             if (!ModelState.IsValid || user is null )
             {
@@ -55,7 +57,7 @@ namespace Data.Controllers
 
             user.Password =  Hash.HashGeneration(user.Password);
 
-            _userService.CreateUser(user);
+            await _userService.CreateUser(user);
 
             var userDTO = new UserDto(user.UserId, user.Name, user.Email);
 
