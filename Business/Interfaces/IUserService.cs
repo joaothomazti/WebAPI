@@ -11,9 +11,9 @@ namespace Business.Interfaces
         #endregion
 
         #region User creation
-        void CreateUser(User user);
+        Task CreateUser(User user);
 
-        void CreateUsers(IEnumerable<User> users);
+        Task CreateUsers(IEnumerable<User> users);
         #endregion
 
         #region User edit

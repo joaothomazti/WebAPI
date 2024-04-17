@@ -20,13 +20,13 @@ namespace Data.UserDAO
         #endregion
 
         #region User creation
-        public async void CreateUser(User user)
+        public async Task CreateUser(User user)
         {
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
         }
 
-        public async void CreateUsers(IEnumerable<User> users)
+        public async Task CreateUsers(IEnumerable<User> users)
         {
             _dbContext.Users.AddRange(users);
             await _dbContext.SaveChangesAsync();
@@ -61,7 +61,7 @@ namespace Data.UserDAO
             if(deletedUser != null)
             {
                 _dbContext.Remove(deletedUser);
-                await _dbContext.SaveChangesAsync();
+                _dbContext.SaveChanges();
             }
             else
             {

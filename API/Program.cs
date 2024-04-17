@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 
 
@@ -69,6 +70,18 @@ builder.Services.AddAuthentication(options =>
     .AddCookie();
 
 builder.Services.AddAuthorization();
+
+string logFilePath = builder.Configuration["Logging:File:Path"] ?? throw new InvalidOperationException("O caminho do arquivo de log não está configurado corretamente.");
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File(Path.Combine(AppContext.BaseDirectory, logFilePath))
+    .CreateLogger();
+
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.ClearProviders(); // Limpar provedores padrão, como ConsoleLoggerProvider
+    loggingBuilder.AddSerilog(); // Adicionar o logger do Serilog
+});
 
 var app = builder.Build();
 
