@@ -1,19 +1,28 @@
 ﻿using Data.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.UserDAO
 {
     public interface IUserData
     {
-        public DbSet<User> GetUsers();
+        #region User listing 
+        DbSet<User> GetUsers();
 
-        public void CreateUser(User user);
+        Task<User?> GetUserById(Guid id);
+        #endregion
 
-        public void CreateUsers(IEnumerable<User> users);
+        #region User creation
+        void CreateUser(User user);
 
-        public void UpdateUser(User user);
+        void CreateUsers(IEnumerable<User> users);
+        #endregion
 
-        public void DeleteUser(User user);
+        #region User edit
+        Task UpdateUser(User user);
+        #endregion
+
+        #region User delete
+        void DeleteUser(User user);
+        #endregion
     }
 }

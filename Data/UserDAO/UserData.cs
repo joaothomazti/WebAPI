@@ -1,6 +1,5 @@
 ﻿using Data.Context;
 using Data.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -13,51 +12,62 @@ namespace Data.UserDAO
         #region User listing
         public DbSet<User> GetUsers() => _dbContext.Users;
 
+        public async Task<User?> GetUserById(Guid id)
+        {
+            return await _dbContext.Users.FindAsync(id);
+        }
+
         #endregion
 
         #region User creation
-        public void CreateUser(User user)
+        public async void CreateUser(User user)
         {
             _dbContext.Users.Add(user);
-            _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void CreateUsers(IEnumerable<User> users)
+        public async void CreateUsers(IEnumerable<User> users)
         {
             _dbContext.Users.AddRange(users);
-            _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
         }
 
         #endregion
 
-        public void UpdateUser(User user)
+        #region User edit
+        public async Task UpdateUser(User user)
         {
-            var updatedUser = this.GetUsers().Find(user.UserId);
+            var updatedUser = await _dbContext.Users.FindAsync(user.UserId);
 
             if (updatedUser != null)
             {
-                _dbContext.Entry(updatedUser).CurrentValues.SetValues(updatedUser);
-                _dbContext.SaveChanges();
+                updatedUser.Name = user.Name;
+                updatedUser.Email = user.Email;
+
+                await _dbContext.SaveChangesAsync();
             }
             else
             {
-                throw new Exception();
+                throw new ArgumentException("Usuário não encontrado");
             }
         }
+        #endregion
 
-        public void DeleteUser(User user)
+        #region User delete
+        public async void DeleteUser(User user)
         {
-            var deletedUser = this.GetUsers().Find(user.UserId);
+            var deletedUser = await _dbContext.Users.FindAsync(user.UserId);
 
             if(deletedUser != null)
             {
                 _dbContext.Remove(deletedUser);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             else
             {
                 throw new Exception();
             }
         }
+        #endregion
     }
 }

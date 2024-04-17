@@ -13,12 +13,12 @@ namespace Business.Services
         #region User listing
         public async Task<IList<User>> GetUsers()
         {
-            return await _userData.GetUsers().ToListAsync();
+            return await _userData.GetUsers().AsNoTracking().ToListAsync();
         }
 
         public async Task<User?> GetUserById(Guid id)
         {
-            return await _userData.GetUsers().FindAsync(id);
+            return await _userData.GetUserById(id);
         }
         #endregion
 
@@ -35,14 +35,18 @@ namespace Business.Services
         }
         #endregion
 
-        public void UpdateUser(User user)
+        #region User edit
+        public async Task UpdateUser(User user)
         {
-            _userData.UpdateUser(user);
+            await _userData.UpdateUser(user);
         }
+        #endregion
 
+        #region User delete
         public void DeleteUser(User user) 
         {
-            _userData.DeleteUser(user);
+             _userData.DeleteUser(user);
         }
+        #endregion
     }
 }
