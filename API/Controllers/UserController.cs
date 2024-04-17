@@ -1,24 +1,22 @@
 ﻿using Business.Interfaces;
-using Data.Context;
 using Data.DTO;
 using Data.helpers;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace Data.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController(ILogger<UserController> logger, IUserService userService, AppDbContext appDbContext) : ControllerBase
+    public class UserController(ILogger<UserController> logger, IUserService userService) : ControllerBase
     {
         private readonly ILogger<UserController> _logger = logger;
         private readonly IUserService _userService = userService;
-        private readonly AppDbContext _appDbContext = appDbContext;
 
 
+        #region User listing
         [Authorize]
         [HttpGet(Name = "findUsers")]
         public async Task<IEnumerable<UserDto>> GetUsers()
@@ -44,8 +42,9 @@ namespace Data.Controllers
                 return new UserDto(user.UserId, user.Name, user.Email);
             }
         }
+        #endregion
 
-
+        #region User creation
         [HttpPost(Name = "CreateUser")]
         public ActionResult<User> CreateUser([FromBody] User user)
         {
@@ -62,22 +61,20 @@ namespace Data.Controllers
 
             return CreatedAtAction("GetUserById", new { id = user.UserId }, userDTO);
         }
+        #endregion
 
+
+        #region User edit
         [HttpPut("{id}")]
         public async Task<IActionResult> EditUser(Guid id, User user)
         {
-            if  (user == null)
-            {
-                throw new ArgumentNullException("O usuário não pode ser nulo");
-            }
-            if (id != user.UserId)
-            {
-                return BadRequest("O ID do usuário não corresponde ao ID na URL");
-            }
+            ArgumentNullException.ThrowIfNull(user);
+
+            user.UserId = id;
 
             try
             {
-                _userService.UpdateUser(user);
+                await _userService.UpdateUser(user);
             }catch (Exception) 
             {
                 var userExists = await _userService.GetUserById(id);
@@ -93,7 +90,9 @@ namespace Data.Controllers
             }
             return NoContent();
         }
+        #endregion
 
+        #region User delete
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
@@ -107,5 +106,6 @@ namespace Data.Controllers
             _userService.DeleteUser(deleteUser);
             return NoContent();
         }
+        #endregion
     }
 }

@@ -4,16 +4,24 @@ namespace Business.Interfaces
 {
     public interface IUserService
     {
-        public Task<IList<User>> GetUsers();
+        #region User Listing
+        Task<IList<User>> GetUsers();
 
-        public Task<User?> GetUserById(Guid id);
+        Task<User?> GetUserById(Guid id);
+        #endregion
 
-        public void CreateUser(User user);
+        #region User creation
+        void CreateUser(User user);
 
-        public void CreateUsers(IEnumerable<User> users);
+        void CreateUsers(IEnumerable<User> users);
+        #endregion
 
-        public void UpdateUser(User user);
+        #region User edit
+        Task UpdateUser(User user);
+        #endregion
 
-        public void DeleteUser(User user);
+        #region User delete
+        void DeleteUser(User user);
+        #endregion
     }
 }
